@@ -14,7 +14,7 @@
 
 ### Changed
 
-- Updated repository URLs and clone commands to `AddySidd27/Azure-Landing-Zone`.
+- Updated repository URLs and clone commands to `AddySidd27/Azure_landing_zone`.
 - Aligned the README, detailed guides, source review, coverage matrix, and diagram descriptions with the implemented management-group hierarchy.
 - Clarified which guidance is implemented by Terraform and which remains production design guidance.
 
