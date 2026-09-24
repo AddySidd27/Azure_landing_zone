@@ -3,7 +3,7 @@
 [![Terraform](https://img.shields.io/badge/Terraform-1.13.x-7B42BC?logo=terraform)](https://developer.hashicorp.com/terraform)
 [![AzureRM](https://img.shields.io/badge/AzureRM-5.x-0078D4?logo=microsoftazure)](https://registry.terraform.io/providers/hashicorp/azurerm/latest)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Terraform CI](https://github.com/AddySidd27/Azure-Landing-Zone/actions/workflows/terraform-ci.yml/badge.svg)](https://github.com/AddySidd27/Azure-Landing-Zone/actions/workflows/terraform-ci.yml)
+[![Terraform CI](https://github.com/AddySidd27/Azure_landing_zone/actions/workflows/terraform-ci.yml/badge.svg)](https://github.com/AddySidd27/Azure_landing_zone/actions/workflows/terraform-ci.yml)
 
 A practical guide to designing, building, validating, and operating an Azure platform foundation with Terraform.
 
@@ -542,8 +542,8 @@ Files ending in `.example` contain placeholders and are safe templates.
 ### Step 1: Clone
 
 ```bash
-git clone https://github.com/AddySidd27/Azure-Landing-Zone.git
-cd Azure-Landing-Zone
+git clone https://github.com/AddySidd27/Azure_landing_zone.git
+cd Azure_landing_zone
 ```
 
 ### Step 2: Bootstrap remote state
