@@ -21,5 +21,9 @@ Copy the output values into the selected `backend.hcl` file.
 
 ## Access model
 
+The storage account disables shared keys, so the platform backend authenticates with Microsoft Entra ID (`use_azuread_auth = true`). Owner and Contributor manage the account but do not include blob data access. Bootstrap therefore assigns **Storage Blob Data Contributor** on the storage account to the identity that runs it. The assignment can take up to 10 minutes to take effect; if the platform `terraform init` returns `403 AuthorizationPermissionMismatch`, wait and retry.
+
+Any other identity that runs the platform stack, such as a pipeline identity, needs the same role on this storage account.
+
 Grant the deployment identity the least privilege required to read and write state blobs. Prefer Microsoft Entra authentication instead of storage account keys. Protect the state resource group and review delete permissions because Terraform state can contain sensitive infrastructure metadata.
 
