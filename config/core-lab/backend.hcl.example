@@ -1,0 +1,6 @@
+resource_group_name  = "rg-contoso-tfstate-eastus2"
+storage_account_name = "stcontosotfxxxxxx"
+container_name       = "tfstate"
+key                  = "core-lab.platform.tfstate"
+use_azuread_auth     = true
+

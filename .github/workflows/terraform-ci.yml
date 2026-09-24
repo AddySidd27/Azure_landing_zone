@@ -1,0 +1,47 @@
+name: Terraform CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        directory: [bootstrap, platform]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.13.3
+
+      - name: Terraform format
+        run: terraform fmt -check -recursive
+
+      - name: Terraform init
+        working-directory: ${{ matrix.directory }}
+        run: terraform init -backend=false -input=false
+
+      - name: Terraform validate
+        working-directory: ${{ matrix.directory }}
+        run: terraform validate
+
+      - name: Terraform tests
+        if: matrix.directory == 'platform'
+        working-directory: platform
+        run: terraform test
+
+      - name: Repository checks
+        if: matrix.directory == 'platform'
+        run: bash scripts/check-repository.sh

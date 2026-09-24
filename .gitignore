@@ -1,0 +1,18 @@
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+.alzlib/
+.DS_Store
+.idea/
+.vscode/
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Local values can contain tenant or subscription details.
+*.auto.tfvars
+terraform.tfvars
+!*.tfvars.example
