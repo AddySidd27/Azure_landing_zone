@@ -57,12 +57,15 @@ resource "azurerm_consumption_budget_subscription" "platform" {
     start_date = formatdate("YYYY-MM-01'T'00:00:00'Z'", timestamp())
   }
 
+  # Subscription budgets need at least one contact email or action group.
   notification {
-    enabled        = length(var.budget_contact_emails) > 0
+    enabled        = true
     threshold      = 80
     operator       = "GreaterThan"
     threshold_type = "Actual"
     contact_emails = var.budget_contact_emails
+    contact_groups = [azurerm_monitor_action_group.platform.id]
+    contact_roles  = ["Owner"]
   }
 
   lifecycle {
