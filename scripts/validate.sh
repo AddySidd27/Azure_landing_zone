@@ -12,4 +12,4 @@ terraform -chdir="$repo_root/platform" init -backend=false -input=false
 terraform -chdir="$repo_root/platform" validate
 terraform -chdir="$repo_root/platform" test
 
-"$repo_root/scripts/check-repository.sh"
+bash "$repo_root/scripts/check-repository.sh"
