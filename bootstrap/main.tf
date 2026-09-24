@@ -39,3 +39,12 @@ resource "azurerm_storage_container" "state" {
   container_access_type = "private"
 }
 
+data "azurerm_client_config" "current" {}
+
+# Shared keys are disabled, so the platform backend uses Microsoft Entra
+# authentication. Owner and Contributor do not include blob data access.
+resource "azurerm_role_assignment" "state_blob_data_contributor" {
+  scope                = azurerm_storage_account.state.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = data.azurerm_client_config.current.object_id
+}
