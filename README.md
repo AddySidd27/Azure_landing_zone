@@ -565,6 +565,8 @@ terraform apply bootstrap.tfplan
 terraform output backend
 ```
 
+Bootstrap grants the signed-in identity **Storage Blob Data Contributor** on the state storage account. Shared keys are disabled, and Owner or Contributor alone cannot read or write state blobs. Role assignments can take up to 10 minutes to take effect; if `terraform init` in Step 4 returns `403 AuthorizationPermissionMismatch`, wait and run it again.
+
 ### Step 3: Create the core configuration
 
 From the repository root:
@@ -574,7 +576,9 @@ cp config/core-lab/backend.hcl.example config/core-lab/backend.hcl
 cp config/core-lab/core-lab.tfvars.example config/core-lab/core-lab.auto.tfvars
 ```
 
-Update the subscription ID, tenant ID, region, name prefix, address spaces, budget, and tags.
+Update the subscription ID, tenant ID, region, name prefix, address spaces, budget, and tags. In `backend.hcl`, copy `resource_group_name` and `storage_account_name` from the bootstrap output. Keep the example `key`; it only names the state file, and each profile should use its own key.
+
+Add your email to `budget_contact_emails` to receive budget alerts. The budget always notifies subscription Owners and the platform Action Group.
 
 Keep these paid or high-scope features disabled for the first deployment:
 
@@ -608,6 +612,8 @@ terraform plan \
 terraform show core-lab.tfplan
 terraform apply core-lab.tfplan
 ```
+
+> **Windows PowerShell:** the trailing `\` line continuation works only in Bash. In PowerShell, use a backtick (`` ` ``) instead, or run the command on one line: `terraform plan -var-file=../config/core-lab/core-lab.auto.tfvars -out=core-lab.tfplan`.
 
 Review tenant, subscription, region, address spaces, public IPs, paid services, role assignments, policy scope, replacements, and deletions before apply.
 
