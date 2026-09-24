@@ -22,6 +22,10 @@
 
 - Corrected the core-lab Terraform test to compare the hub address space without assuming a list type.
 - Removed the empty root tests-folder entry from the repository map.
+- Bootstrap now assigns Storage Blob Data Contributor on the state storage account so the platform backend can authenticate with Microsoft Entra ID when shared keys are disabled.
+- The subscription budget notification now always includes the platform Action Group and the Owner role, because Azure requires at least one contact email or action group.
+- The allowed-locations policy assignment now uses the built-in policy ID instead of a display-name lookup.
+- Documented role propagation, backend key usage, and Windows PowerShell line continuation for the core lab.
 
 ## 1.4.0 - 2026-09-23
 
