@@ -34,6 +34,7 @@ The root [README](../README.md) is the complete guided route. You do not need to
 - [Deployment guide](03-implementation/deployment-guide.md)
 - [Cost and safety](03-implementation/cost-and-safety.md)
 - [Deployment identity](03-implementation/deployment-identity.md)
+- [Minimum viable platform landing zone](03-implementation/minimum-viable-platform-landing-zone.md)
 - [IaC Accelerator and AVM](03-implementation/avm-and-accelerator.md)
 - [Validation strategy](03-implementation/validation-strategy.md)
 - [Portal validation](03-implementation/portal-validation.md)

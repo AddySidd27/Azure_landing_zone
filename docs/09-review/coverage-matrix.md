@@ -43,6 +43,7 @@ This matrix shows what the repository explains, deploys, and validates. `Design`
 | Multi-region | Design | Platform/workload responsibility model | [Multi-region](../02-design-areas/multi-region.md) |
 | Remote state | Terraform + lab | Bootstrap and recovery controls | [Bootstrap lab](../04-labs/lab-01-bootstrap-state.md) |
 | Platform CI/CD | GitHub Actions | Format, init, validate, repository checks | [Automation and DevOps](../02-design-areas/platform-automation-devops.md) |
+| Minimum viable platform landing zone | Design guidance + Terraform | Seven capabilities, readiness checks, and the gaps in this repository against Learn's minimum | [Minimum viable platform](../03-implementation/minimum-viable-platform-landing-zone.md) |
 | IaC Accelerator and AVM | Design guidance | Production selection, module composition, pipeline bootstrap, and migration guidance | [Accelerator and AVM](../03-implementation/avm-and-accelerator.md) |
 | Greenfield | End-to-end case | Requirements through first workload and operations | [Greenfield](../05-use-cases/greenfield.md) |
 | Brownfield | End-to-end case | Inventory through migration, enforcement, and retirement | [Brownfield](../05-use-cases/brownfield.md) |
