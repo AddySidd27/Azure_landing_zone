@@ -16,8 +16,8 @@ You should understand basic Azure resources, resource groups, subscriptions, vir
 
 For the core lab, you need:
 
-- an Azure subscription where you can create resource groups and networking resources;
-- permission to create role assignments only if the RBAC examples are enabled;
+- an Azure subscription where you can create resource groups, networking, monitoring resources, a subscription diagnostic setting, and a budget (creating resources is a separate right from creating role assignments; the deploying user needs both, and Owner covers both);
+- permission to create role assignments, because the state bootstrap always assigns **Storage Blob Data Contributor** on the state storage account (Owner, User Access Administrator, or Role Based Access Control Administrator at that scope provide it);
 - permission to create subscription-level policy assignments only if governance deployment is enabled.
 
 For the enterprise management-group path, you also need permission to create and manage management groups and assign policy at management-group scope. Use a dedicated lab tenant when possible. Do not experiment with tenant-wide controls in a production tenant.

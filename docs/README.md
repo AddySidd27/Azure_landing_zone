@@ -39,6 +39,7 @@ The root [README](../README.md) is the complete guided route. You do not need to
 - [Validation strategy](03-implementation/validation-strategy.md)
 - [Portal validation](03-implementation/portal-validation.md)
 - [Guided labs](04-labs/)
+- [Core-lab run sheet: run the core lab in a sandbox and collect redacted evidence](04-labs/core-lab-run-sheet.md)
 - [Use cases](05-use-cases/use-cases.md)
 - [Subscription vending](05-use-cases/subscription-vending.md)
 - [End-to-end greenfield organization](05-use-cases/greenfield.md)

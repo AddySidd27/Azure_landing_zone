@@ -4,6 +4,8 @@
 
 ### Added
 
+- Added a core-lab run sheet (`docs/04-labs/core-lab-run-sheet.md`): a before-you-start checklist, exact commands in order, what the code is expected to produce, an evidence capture list with file names and redaction rules, a destroy section with a nothing-left-billing check, and a list of what to send back. It claims no results.
+- Added README sections for what the repository is and is not, who it is for, a Status table (including that real-deployment evidence is not published yet), a 15-minute start path, per-profile cost notes, and known limits.
 - Added the five Cloud Adoption Framework landing-zone design principles to the main guide.
 - Added Corp, Online, and Local archetype explanations and guardrail examples.
 - Added the dedicated Security management-group and subscription operating model.
@@ -14,6 +16,12 @@
 
 ### Changed
 
+- Rewrote the top of the README and updated its navigation table. The Terraform and AzureRM badges now match `versions.tf` (Terraform `>= 1.9.0, < 2.0.0`, AzureRM pinned to 5.4.0).
+- Corrected the README prerequisite from "Terraform 1.13.x" to the version range in `versions.tf`; CI uses 1.13.3.
+- Corrected the prerequisites guide: role-assignment permission is always needed, because bootstrap assigns Storage Blob Data Contributor on the state storage account.
+- Run sheet and README now name the exact flags to keep off, state that the core plan is 20 resources (19 without activity-log diagnostics), require the tfvars IDs to match `az account show`, and explain that `NetworkWatcherRG` is created by Azure and is not a leftover.
+- Added the run sheet to the documentation map and the README repository map.
+- Documented the full destroy order, including the bootstrap stack and its local state file.
 - Updated repository URLs and clone commands to `AddySidd27/Azure_landing_zone`.
 - Aligned the README, detailed guides, source review, coverage matrix, and diagram descriptions with the implemented management-group hierarchy.
 - Clarified which guidance is implemented by Terraform and which remains production design guidance.

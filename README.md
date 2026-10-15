@@ -1,20 +1,24 @@
 # Azure Enterprise Landing Zone
 
-[![Terraform](https://img.shields.io/badge/Terraform-1.13.x-7B42BC?logo=terraform)](https://developer.hashicorp.com/terraform)
-[![AzureRM](https://img.shields.io/badge/AzureRM-5.x-0078D4?logo=microsoftazure)](https://registry.terraform.io/providers/hashicorp/azurerm/latest)
+[![Terraform](https://img.shields.io/badge/Terraform-%E2%89%A51.9%2C%20%3C2.0-7B42BC?logo=terraform)](https://developer.hashicorp.com/terraform)
+[![AzureRM](https://img.shields.io/badge/AzureRM-5.4.0%20pinned-0078D4?logo=microsoftazure)](https://registry.terraform.io/providers/hashicorp/azurerm/latest)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Terraform CI](https://github.com/AddySidd27/Azure_landing_zone/actions/workflows/terraform-ci.yml/badge.svg)](https://github.com/AddySidd27/Azure_landing_zone/actions/workflows/terraform-ci.yml)
 
-A practical guide to designing, building, validating, and operating an Azure platform foundation with Terraform.
+A learning and reference lab for designing, building, validating, and operating an Azure platform foundation with Terraform.
 
-This repository focuses on the Azure landing zone platform: tenant decisions, management groups, subscriptions, identity, governance, networking, security, monitoring, automation, cost control, and operations. It does not deploy business workloads.
-
-> Start with the low-cost lab. The advanced profile can create paid services such as Azure Firewall, Bastion, DNS Private Resolver, and Defender plans.
+> **Read this first.** This repository is **not** the official Azure Landing Zones accelerator and it is **not** a production-ready platform. It is a small, readable example that explains how the parts of a landing zone fit together. For production, use Microsoft's accelerator with Azure Verified Modules. See [how this repository relates to the official implementation](#5a-how-this-repository-relates-to-the-official-azure-landing-zones-implementation).
 
 ## Navigation
 
 | I want to | Go to |
 |---|---|
+| Know in 60 seconds what this is | [What this repository is](#what-this-repository-is) |
+| Check what is tested and what is not | [Status](#status) |
+| Run the low-cost lab | [Start in about 15 minutes](#start-in-about-15-minutes) |
+| Know what it costs | [What it costs](#what-it-costs) |
+| Know what it cannot do | [Known limits](#known-limits) |
+| Run the lab and collect evidence in a sandbox | [Core-lab run sheet](docs/04-labs/core-lab-run-sheet.md) |
 | Understand the landing zone | [Concept](#1-azure-landing-zone-concept) |
 | See the exact repository scope | [Scope](#2-scope) |
 | Follow the correct learning order | [Learning and build order](#recommended-learning-and-build-order) |
@@ -31,6 +35,210 @@ This repository focuses on the Azure landing zone platform: tenant decisions, ma
 | Follow complete examples | [End-to-end cases](#13-end-to-end-case-studies) |
 | Open any folder | [Repository map](#14-repository-map) |
 | Review official sources | [Microsoft sources](#15-verified-microsoft-sources) |
+
+---
+
+## What this repository is
+
+An Azure landing zone is a prepared and governed Azure environment: management groups, subscriptions, access rules, networking, policy, logging, and cost controls set up before teams deploy workloads. This repository shows one small way to build the shared platform part of that with Terraform, and explains each design decision beside the code.
+
+**Who it is for**
+
+- People learning how an Azure landing zone is put together.
+- Architects who want a small, readable example to discuss or demonstrate.
+- Reviewers who want to read the Terraform and the reasoning side by side.
+
+**Who it is not for**
+
+- Anyone who needs a production platform. Use the [official accelerator](docs/03-implementation/avm-and-accelerator.md).
+- Anyone who wants to deploy business workloads. This repository deploys none.
+- Anyone who wants a cost-free way to learn. The core lab is designed to avoid the highest-cost services, but it still creates billable resources. Read [What it costs](#what-it-costs).
+
+**What you get**
+
+- Terraform for a remote-state bootstrap and for a platform stack (resource groups, a hub network and one spoke, subnets, peering, a network security group, a route table, a Log Analytics workspace, subscription Activity Log diagnostics, an Action Group, and a subscription budget).
+- Optional switches for management groups, one audit-mode policy assignment, Azure Firewall, Azure Bastion, DNS Private Resolver, a Key Vault with a private endpoint, and Defender plans. All are off in the core lab.
+- Native Terraform tests, a CI workflow, and repository check scripts.
+- Design guides, ten guided labs, operations and troubleshooting notes, and twelve diagrams.
+
+Unfamiliar term? See the [glossary](docs/08-reference/glossary.md).
+
+Everything is under the [MIT license](LICENSE). This is an independent learning repository, not an official Microsoft product or support channel.
+
+---
+
+## Status
+
+| Item | Current state | Source |
+|---|---|---|
+| Terraform version | `>= 1.9.0, < 2.0.0`. CI uses 1.13.3. | `platform/versions.tf`, `bootstrap/versions.tf`, `.github/workflows/terraform-ci.yml` |
+| AzureRM provider | Exactly `5.4.0` (pinned in `versions.tf`). The `random` provider is `~> 3.7`. Both `bootstrap` and `platform` have a `.terraform.lock.hcl`. | `versions.tf` and `.terraform.lock.hcl` in `platform/` and `bootstrap/` |
+| What CI checks | `terraform fmt -check -recursive`, `terraform init -backend=false`, and `terraform validate` for `bootstrap` and `platform`; `terraform test` for `platform`; `scripts/check-repository.sh` (file checks, no committed state or local values, local link check). | `.github/workflows/terraform-ci.yml` |
+| What the tests prove | Two native test files plan with a **mocked** provider and check resource counts (for example, no Firewall or Bastion in the core lab). They never contact Azure. | `platform/tests/` |
+| What CI does not do | It does not sign in to Azure, run a real plan, apply anything, or check external links (`scripts/check-links.sh --external` is run by hand). | `.github/workflows/terraform-ci.yml` |
+| Microsoft Learn source review | Last recorded 2026-09-24. | [Review record](docs/09-review/microsoft-learn-review.md) |
+| **Real-deployment evidence** | **Not published yet.** No plan output, apply output, or portal screenshot from a real Azure subscription is included in this repository. Until that evidence is added, treat the Terraform as validated and unit-tested, but not as proven in a live subscription. | This table |
+
+A [run sheet](docs/04-labs/core-lab-run-sheet.md) describes how to run the core lab in a sandbox subscription and collect that evidence safely.
+
+---
+
+## Start in about 15 minutes
+
+This path runs the **core lab** only. About 15 minutes covers reading this section and preparing your files. How long Azure takes to create or delete the resources has not been measured.
+
+### What you need, and why
+
+| Need | Why |
+|---|---|
+| A **dedicated sandbox Azure subscription** | Everything is created in one subscription. Do not use a production subscription. |
+| **Owner** on that subscription (simplest choice) | Bootstrap creates a role assignment, which needs `Microsoft.Authorization/roleAssignments/write` ([Microsoft Learn](https://learn.microsoft.com/azure/role-based-access-control/role-assignments-portal)). The platform stack creates resources, a subscription Activity Log diagnostic setting, and a subscription budget; Learn lists Owner as able to create budgets ([Microsoft Learn](https://learn.microsoft.com/azure/cost-management-billing/costs/tutorial-acm-create-budgets)). A smaller set of roles may work, but it has not been tested here. |
+| No tenant-level permission | The core lab leaves management groups off, so it does not need management-group permissions. |
+| Azure CLI | Sign in and confirm which subscription you are using. Terraform's Azure provider can use your `az login` session, so you do not need to create a separate identity. |
+| Permission to create resources | Owner covers this too. Role-assignment rights alone are not enough. |
+| Terraform 1.9 or newer, below 2.0 | Runs the code. CI uses 1.13.3. |
+| Git | Downloads the repository. |
+
+If your subscription is new, Learn says it can take up to 48 hours before Cost Management features, including budgets, are usable.
+
+### Commands
+
+Confirm where you are, and stop if the tenant or subscription is wrong:
+
+```bash
+az login
+az account set --subscription "<subscription-id>"
+az account show --query "{tenantId:tenantId,subscriptionId:id,name:name}" --output table
+```
+
+Download the repository and create the remote state storage (bootstrap):
+
+```bash
+git clone https://github.com/AddySidd27/Azure_landing_zone.git
+cd Azure_landing_zone/bootstrap
+cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars: set your tenant ID and subscription ID.
+terraform init
+terraform fmt -check
+terraform validate
+terraform plan -out=bootstrap.tfplan
+terraform show bootstrap.tfplan
+terraform apply bootstrap.tfplan
+terraform output backend
+```
+
+Create your two local configuration files. They are ignored by Git:
+
+```bash
+cd ..
+cp config/core-lab/backend.hcl.example config/core-lab/backend.hcl
+cp config/core-lab/core-lab.tfvars.example config/core-lab/core-lab.auto.tfvars
+# In backend.hcl: copy resource_group_name and storage_account_name from the bootstrap output.
+# In core-lab.auto.tfvars: set subscription_id and tenant_id; add your email to budget_contact_emails.
+# Keep these false or empty for the first run: deploy_management_groups, deploy_subscription_policy,
+# enable_firewall, enable_bastion, enable_dns_private_resolver, enable_key_vault, defender_plans.
+# enable_activity_log_diagnostics stays true (it is part of the core lab).
+# Terraform uses the IDs in these files, not your az login context. Make them match `az account show`,
+# in both bootstrap/terraform.tfvars and core-lab.auto.tfvars.
+```
+
+Deploy the core lab:
+
+```bash
+cd platform
+terraform init -backend-config=../config/core-lab/backend.hcl
+terraform fmt -check -recursive
+terraform validate
+terraform test
+terraform plan -var-file=../config/core-lab/core-lab.auto.tfvars -out=core-lab.tfplan
+terraform show core-lab.tfplan
+terraform apply core-lab.tfplan
+terraform output
+cd ..   # back to the repository root
+```
+
+If `terraform init` returns `403 AuthorizationPermissionMismatch`, wait up to 10 minutes for the new role assignment to take effect, then run it again. See [Section 8](#8-deploy-the-core-lab) and the [deployment guide](docs/03-implementation/deployment-guide.md) for the full explanation.
+
+### Expected outcome (from the code)
+
+This describes what the Terraform is written to produce. It is not a recorded result.
+
+- `terraform output` prints four values:
+  - `resource_groups`: a connectivity group and a management group named from your `name_prefix`, `environment`, and `location`; `security` is `null`.
+  - `networking`: the IDs of the hub network, the spoke network, and the workload subnet; `firewall_private_ip` is `null`.
+  - `management`: the IDs of the Log Analytics workspace and the Action Group.
+  - `enabled_features`: `management_groups`, `subscription_policy`, `firewall`, `bastion`, `dns_private_resolver`, and `key_vault` all `false`, and `defender_plans` empty.
+- The platform plan is expected to add 20 resources and change or destroy none (a count of the active resource blocks with the core-lab values). It is 19 if you set `enable_activity_log_diagnostics = false`.
+- The hub and spoke networks are peered in both directions.
+
+### How to destroy it
+
+Destroy the platform first, then the state storage. Do not delete the state storage before the resources it tracks. Run this from the repository root.
+
+```bash
+cd platform
+terraform plan -destroy -var-file=../config/core-lab/core-lab.auto.tfvars -out=destroy.tfplan
+terraform show destroy.tfplan
+terraform apply destroy.tfplan
+
+cd ../bootstrap
+terraform plan -destroy -out=bootstrap-destroy.tfplan
+terraform show bootstrap-destroy.tfplan
+terraform apply bootstrap-destroy.tfplan
+```
+
+Keep `bootstrap/terraform.tfstate`, which stays on your computer, until the bootstrap destroy is finished. The [run sheet](docs/04-labs/core-lab-run-sheet.md#8-destroy-everything) adds a check that nothing is left billing.
+
+---
+
+## What it costs
+
+This repository does not publish prices, because prices change by region and over time. Use the [Azure pricing calculator](https://azure.microsoft.com/pricing/calculator/) for your region, and [Cost Management](https://learn.microsoft.com/azure/cost-management-billing/costs/quick-acm-cost-analysis) for what you were actually charged.
+
+**Core lab (and the bootstrap it needs)**
+
+| Resource | Cost note |
+|---|---|
+| Virtual networks (hub and spoke) | Learn lists the virtual network itself as free. |
+| VNet peering | Creating a peering is free. Data sent across it is charged per GB ([Learn](https://learn.microsoft.com/azure/virtual-network/virtual-networks-faq#virtual-network-peering)). This repository deploys no virtual machines, so the lab creates no workload traffic. |
+| Network security group, route table, resource groups | Not listed as billed items in the Learn pages used for this review. Confirm in the calculator. |
+| Log Analytics workspace | No charge to create. You pay for data ingested and for retention ([Learn](https://learn.microsoft.com/azure/azure-monitor/logs/log-analytics-workspace-overview)). Learn says there is no ingestion charge for the Activity Log ([Learn](https://learn.microsoft.com/azure/azure-monitor/fundamentals/activity-log)). Anything else that sends data to the workspace is billed. |
+| Action Group, subscription budget | Prices not verified here. Check the calculator. |
+| Terraform state storage account (bootstrap) | A paid storage account with blob versioning and 14-day delete retention turned on (see `bootstrap/main.tf`). |
+
+**Full platform profile (not for a first run)**
+
+| Resource | Cost note |
+|---|---|
+| Azure Firewall (Standard) with a Standard public IP | Paid per hour and per data processed. Public IPs are charged per hour ([Learn](https://learn.microsoft.com/azure/virtual-network/virtual-network-cost-optimization)). |
+| Azure Bastion (Basic) with a Standard public IP | Paid per hour. |
+| DNS Private Resolver (inbound and outbound endpoints) | Paid per endpoint. |
+| Key Vault with a private endpoint and a private DNS zone | Paid per operation, plus private endpoint charges. Purge protection is on and soft-delete retention is 90 days, so a destroyed vault stays in a deleted state until that period ends. |
+| Management groups and the audit-mode policy assignment | Prices not verified here. |
+| Defender plans | None unless you list plans in `defender_plans`. Paid. |
+
+**See your real cost**
+
+1. In the Azure portal open **Cost Management** and choose **Cost analysis** with the subscription as scope. The **Cost by resource** view lists charges per resource ([Learn](https://learn.microsoft.com/azure/cost-management-billing/costs/cost-analysis-built-in-views)).
+2. Cost data is typically available after 8 to 24 hours, so check again the day after you deploy and the day after you destroy.
+3. A budget sends alerts. It does **not** stop spending or switch anything off ([Learn](https://learn.microsoft.com/azure/cost-management-billing/costs/tutorial-acm-create-budgets)).
+
+**Always destroy when you finish.** More detail: [cost and safety](docs/03-implementation/cost-and-safety.md).
+
+---
+
+## Known limits
+
+- **No published live evidence yet.** See [Status](#status).
+- **Not production.** It has no Conditional Access, no privileged access management, no SIEM, no hybrid connectivity, and one audit-mode policy example instead of a policy library. The [scope section](#2-scope) lists what is covered.
+- **One subscription.** The code deploys into the single subscription set in the provider. Management groups act at tenant scope. See the [enterprise extension](docs/03-implementation/enterprise-extension.md).
+- **No workloads.** With no virtual machines, you cannot test effective routes or name resolution from a real client. The core lab can show the route table and its subnet association, but it has no custom routes while the firewall is off.
+- **A budget is an alert, not a limit.**
+- **State storage is reachable from the internet.** Shared keys are disabled and access needs Microsoft Entra ID plus a blob data role, but the storage account keeps public network access on (`bootstrap/main.tf`). Bootstrap keeps its own state in a local file.
+- **The workspace accepts internet ingestion and queries** (`platform/management.tf`).
+- **Full platform is tested only by a mocked plan.** The test checks resource counts, not behavior.
+- **Exact provider pin.** AzureRM is fixed at 5.4.0, so you must review the provider release notes and update the pin and lock file yourself.
+- **Deleted workspaces keep their name for 14 days.** If you destroy and re-create the lab with the same names inside that period, Azure may recover the old workspace or reject the name ([Learn](https://learn.microsoft.com/azure/azure-monitor/logs/delete-workspace)).
 
 ---
 
@@ -505,9 +713,9 @@ Required:
 
 - Git;
 - Azure CLI;
-- Terraform 1.13.x;
+- Terraform 1.9 or newer and below 2.0 (CI uses 1.13.3);
 - an Azure subscription for the lab;
-- permissions for the resources being deployed;
+- permissions for the resources being deployed, including permission to create role assignments (bootstrap creates one on the state storage account);
 - additional tenant or management-group permissions only when those options are enabled.
 
 Confirm the active Azure context:
@@ -538,6 +746,8 @@ Files ending in `.example` contain placeholders and are safe templates.
 ---
 
 ## 8. Deploy the core lab
+
+This section explains each step. For a shorter command list see [Start in about 15 minutes](#start-in-about-15-minutes). To run the lab and collect evidence, use the [core-lab run sheet](docs/04-labs/core-lab-run-sheet.md).
 
 ### Step 1: Clone
 
@@ -705,6 +915,8 @@ Complete the labs in order.
 | 9 | [Test monitoring](docs/04-labs/lab-09-monitoring-alert.md) | Signal, alert, recipient, and response |
 | 10 | [Practice platform recovery](docs/04-labs/lab-10-platform-recovery.md) | Recovery steps, dependencies, and result |
 
+To run the core lab in a sandbox subscription and collect redacted evidence, follow the [core-lab run sheet](docs/04-labs/core-lab-run-sheet.md).
+
 ---
 
 ## 12. Day-2 operations
@@ -788,7 +1000,7 @@ Every maintained folder is linked below.
 | [docs/01-foundations](docs/01-foundations/) | Concepts and operating model |
 | [docs/02-design-areas](docs/02-design-areas/) | Platform design decisions |
 | [docs/03-implementation](docs/03-implementation/) | Deployment and validation |
-| [docs/04-labs](docs/04-labs/) | Guided exercises |
+| [docs/04-labs](docs/04-labs/) | Guided exercises and the [core-lab run sheet](docs/04-labs/core-lab-run-sheet.md) |
 | [docs/05-use-cases](docs/05-use-cases/) | Platform scenarios |
 | [docs/06-operations](docs/06-operations/) | Day-2 operations |
 | [docs/07-troubleshooting](docs/07-troubleshooting/) | Failure diagnosis |
@@ -839,7 +1051,7 @@ A release is ready for use only after:
 - a saved Terraform plan is reviewed;
 - any claimed Azure deployment has portal and CLI evidence.
 
-GitHub Actions runs Terraform and repository checks on pushes and pull requests. An authenticated Azure plan and apply remain the responsibility of the Azure environment owner.
+GitHub Actions runs Terraform and repository checks on pushes and pull requests. An authenticated Azure plan and apply remain the responsibility of the Azure environment owner. No real-deployment evidence is published yet; see the [Status](#status) table.
 
 ## Project information
 
