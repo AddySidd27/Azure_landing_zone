@@ -39,5 +39,5 @@ Validation has several layers. One green command is not complete evidence.
 
 ## Release evidence
 
-Store CI run links, sanitized plan summary, deployment date, environment, validation results, known limitations, and the tested commit SHA. Do not commit a hand-written `PASS` text file as proof.
+Store CI run links, sanitized plan summary, deployment date, environment, validation results, known limitations, and the tested commit SHA. Do not commit a hand-written `PASS` text file as proof. The current record is in [Release Evidence](release-evidence.md).
 
